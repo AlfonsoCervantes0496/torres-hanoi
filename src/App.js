@@ -57,6 +57,19 @@ const App = () => {
 
   const reset = () => {
     //COMPLETAR
+    towerOne =new Tower()
+    towerTwo =new Tower()
+    towerThree =new Tower()
+    if(disks >0){
+      for(let i = disks; i>0; i--){
+        towerOne.add(i)
+      }
+    }
+    setTowerOne(towerOne)
+    setTowerTwo(towerTwo)
+    setTowerThree(towerThree)
+    setMoveCount(0)
+
   };
 
   const handleDrag = (e, tile, id) => {
@@ -75,21 +88,36 @@ const App = () => {
     let source = towers[dragTile.towerId].tower; //Torre de origen
     let destination = towers[dropColumn].tower; //Torre de destino
 
-    const goodMove = source.moveTopTo(destination); //Mover el disco desde la torre de origen al destino
+    const goodMove = source.moveTopTo(destination, setMoveCount,moveCount); //Mover el disco desde la torre de origen al destino
     if(goodMove){ //Si es un movimiento valido -> incrementar los movimientos
       setMoveCount((prevState) => prevState + 1); //Actualizar los movimientos
+      setTiles(towerOne.disks.traverse())
+      setTilesTwo(towerTwo.disks.traverse())
+      setTilesThree(towerThree.disks.traverse())
     }
   };
 
   const solve = () => {
     //COMPLETAR
+  const goodMove = towerOne.moveDisks(disks, towerThree, towerTwo)
+  if(goodMove){
+    setMoveCount((2**disks)-1)
+    setTiles(towerOne.disks.traverse())
+    setTilesTwo(towerTwo.disks.traverse())
+    setTilesThree(towerThree.disks.traverse())
+  }
   };
 
-  const winCondition = false; //COMPLETAR
+  const winCondition = towerOne.length===0 && towerTwo.length===0 ? true : false
   return (
     <>
       <div className="container">
-        <GameOptionsComp disks={disks} />
+        <GameOptionsComp 
+        
+        disks={disks} 
+        setDisks={setDisks}
+        reset={reset}
+        solve={solve}/>
         <div className="content">
           <TowerComp
             id={1}
@@ -110,9 +138,9 @@ const App = () => {
             handleDrop={handleDrop}
           />
         </div>
-        {winCondition && (
+        {winCondition && 
           <WinMessageComp moveCount={moveCount}/>
-        )}
+        }
         Movimientos: {moveCount}
       </div>
     </>
